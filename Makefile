@@ -17,3 +17,8 @@ echo/%.pb.go: %.proto
 .PHONY: container
 container: echo/echo.pb.go
 	docker build -t grpc-echo .
+
+.PHONY: deploy/gcr
+deploy/gcr:
+	docker tag grpc-echo gcr.io/aky-sh/grpc-echo
+	docker push gcr.io/aky-sh/grpc-echo
