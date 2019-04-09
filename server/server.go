@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/akkyie/grpc-echo/echo"
 )
@@ -15,7 +16,13 @@ func NewServer() (*Server, error) {
 }
 
 func (server *Server) UnaryEcho(ctx context.Context, req *echo.EchoRequest) (*echo.EchoResponse, error) {
-	return &echo.EchoResponse{Message: req.GetMessage()}, nil
+	hostname, err := os.Hostname()
+	if err != nil {
+		return nil, err
+	}
+
+	message := fmt.Sprintf("[%s] %s", hostname, req.GetMessage())
+	return &echo.EchoResponse{Message: message}, nil
 }
 
 func (server *Server) ServerStreamingEcho(*echo.EchoRequest, echo.Echo_ServerStreamingEchoServer) error {

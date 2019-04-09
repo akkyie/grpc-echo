@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package grpc.examples.echo;
+package sh.aky.grpc;
 
 option go_package = "echo";
 

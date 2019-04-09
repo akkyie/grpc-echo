@@ -1,0 +1,13 @@
+type: google.api.Service
+config_version: 3
+
+name: grpc-echo.endpoints.aky-sh.cloud.goog
+
+title: Echo with gRPC
+apis:
+  - name: sh.aky.grpc.Echo
+
+usage:
+  rules:
+    - selector: sh.aky.grpc.Echo.UnaryEcho
+      allow_unregistered_calls: true

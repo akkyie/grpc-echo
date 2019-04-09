@@ -1,0 +1,39 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grpc-echo-service
+  namespace: grpc-echo
+  labels:
+    app: grpc-echo-app
+  annotations:
+    cloud.google.com/app-protocols: '{"grpc-echo-port": "HTTP2"}'
+spec:
+  clusterIP: None
+  ports:
+    - name: grpc-echo-port
+      protocol: TCP
+      port: 50051
+      targetPort: 50051
+  selector:
+    app: grpc-echo-app
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: envoy-service
+  namespace: grpc-echo
+  labels:
+    app: envoy-proxy
+  annotations:
+    cloud.google.com/app-protocols: '{"grpc-echo-port": "HTTP2"}'
+spec:
+  type: LoadBalancer
+  ports:
+    - name: envoy-port
+      protocol: TCP
+      port: 10000
+      targetPort: 10000
+  selector:
+    app: envoy-proxy

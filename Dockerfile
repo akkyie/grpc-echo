@@ -2,8 +2,8 @@ FROM golang:latest AS builder
 
 WORKDIR /go/src/github.com/akkyie/grpc-echo
 COPY . .
-RUN go get ./...
-RUN make CGO_ENABLED=0 GOOS=linux GOARCH=amd64 build
+RUN go get -v ./...
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/grpc-echo
 
 FROM alpine
 RUN apk add --no-cache ca-certificates

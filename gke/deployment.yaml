@@ -1,0 +1,78 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: grpc-echo-deployment
+  namespace: grpc-echo
+spec:
+  replicas: 3
+  revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: grpc-echo-app
+    spec:
+      containers:
+        # - name: grpc-echo-esp
+        #   image: gcr.io/endpoints-release/endpoints-runtime:1
+        #   args: [
+        #     "--service", "grpc-echo.endpoints.aky-sh.cloud.goog",
+        #     "--http_port", "8080",
+        #     "--http2_port", "9000",
+        #     "--backend", "grpc://127.0.0.1:50051",
+        #     "--rollout_strategy=managed",
+        #     "-z", " "
+        #   ]
+        #   ports:
+        #     - containerPort: 9000
+        #   readinessProbe:
+        #     httpGet:
+        #       path: /
+        #       port: 8080
+
+        - name: grpc-echo-server
+          image: gcr.io/aky-sh/grpc-echo:latest
+          ports:
+            - containerPort: 50051
+              protocol: TCP
+          resources:
+            limits:
+              memory: 128Mi
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: envoy-deployment
+  namespace: grpc-echo
+spec:
+  replicas: 1
+  revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: envoy-proxy
+    spec:
+      containers:
+        - name: envoy
+          image: envoyproxy/envoy:latest
+          command:
+            - "/usr/local/bin/envoy"
+          args:
+            - "--config-path /etc/envoy/envoy.yaml"
+          ports:
+            - containerPort: 10000
+              protocol: TCP
+          resources:
+            limits:
+              memory: 512Mi
+          volumeMounts:
+            - name: envoy-config-volume
+              mountPath: /etc/envoy
+      volumes:
+        - name: envoy-config-volume
+          configMap:
+            name: envoy-config-map
